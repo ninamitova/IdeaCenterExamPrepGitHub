@@ -1,0 +1,38 @@
+# CI Workflow for .NET project
+# Restores dependencies, builds the solution, and runs all tests
+# Triggered on push or pull request to main branch
+
+name: .NET CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      TEST_USER_EMAIL:    "Tester@example.com"
+      TEST_USER_PASSWORD: "Tester"
+      BASE_URL:           "http://softuni-qa-loadbalancer-2137572849.eu-north-1.elb.amazonaws.com:84/"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore IdeaCenterExamPrep.sln
+
+      - name: Build solution
+        run: dotnet build IdeaCenterExamPrep.sln --no-restore
+
+      - name: Run tests
+        run: dotnet test IdeaCenterExamPrep.sln --no-build --verbosity normal
